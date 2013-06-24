@@ -8,7 +8,7 @@ var FETKit = {
             effect: ''
         },
         container : '',
-        effectSetup: function(effect) {
+        effectSetup: function(effect) { //UNFINISHED BUT BETTER
             var loadfunc = function() {
                 var returnFunc = '';
                 switch(effect) {
@@ -40,7 +40,7 @@ var FETKit = {
                         
                     break;
                     */
-                }
+                };
                 return returnFunc;
             }
         },
@@ -75,7 +75,7 @@ var FETKit = {
                 $(images).css({'margin-top':-(($(images).height()-$(container).height())/2)});
                 $(images).css({'margin-left':-(($(images).width()-$(container).width())/2)});
                 
-            }
+            };
             $(window).resize(function() {
                 layout();
             });
