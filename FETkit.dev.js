@@ -1,5 +1,5 @@
 var FETKit = {
-    image_gallery: {
+    imageGallery: {
         ready: false,
         currentIndex: 0,
         customId: '',
@@ -8,44 +8,42 @@ var FETKit = {
             effect: ''
         },
         container : '',
-        effectSetup: function(effect) { //UNFINISHED BUT BETTER
-            var loadfunc = function() {
-                var returnFunc = '';
-                switch(effect) {
-                    case 'fade':
-                        returnFunc = function() { 
-                            $(lis).css({'float':'none'});
-                            $(lis).not(currentVis).css({'opacity':0,'position':'absolute','z-index':'0'});
-                            currentVis.css({'position':'absolute','z-index':'8'});
-                            FETKit.image_gallery.type.effect = 'fade';  
-                        }
-                    break;
-                   
-                    case 'slide':
-                        returnFunc = function() { 
-                            $(lis).css({'float':'left'});
-                            $(lis).parent().css('width',$(container).width()*$(lis).size());
-                            $(lis).not(currentVis).css({'opacity':1,'position':'relative','z-index':'1'});
-                            currentVis.css({'position':'relative','z-index':'8'});
-                            FETKit.image_gallery.type.effect = 'slide';
-                        }
-                        
-                        //NEEDS TO BE FINISHED ( SEE BELOW )
-                        
-                    break;
-                     /*
-                    case 'mask':
+        effectSetup: function(effect) { //NEEDS TO BECOME THE ACTUAL IMPLEMENTATION
+            var returnFunc = '';
+            switch(effect) {
+                case 'fade':
+                    returnFunc = function() { 
+                        $(lis).css({'float':'none'});
+                        $(lis).not(currentVis).css({'opacity':0,'position':'absolute','z-index':'0'});
+                        currentVis.css({'position':'absolute','z-index':'8'});
+                        FETKit.imageGallery.type.effect = 'fade';
+                    }
+                break;
+               
+                case 'slide':
+                    returnFunc = function() { 
+                        $(lis).css({'float':'left'});
+                        $(lis).parent().css('width',$(container).width()*$(lis).size());
+                        $(lis).not(currentVis).css({'opacity':1,'position':'relative','z-index':'1'});
+                        currentVis.css({'position':'relative','z-index':'8'});
+                        FETKit.imageGallery.type.effect = 'slide';
+                    }
                     
-                        //NEEDS TO BE PORTED IN
-                        
-                    break;
-                    */
-                };
-                return returnFunc;
-            }
+                    //NEEDS TO BE FINISHED ( SEE BELOW )
+                    
+                break;
+                 /*
+                case 'mask':
+                
+                    //NEEDS TO BE PORTED IN
+                    
+                break;
+                */
+            };
+            return returnFunc;
         },
-        setup: function(effect,container) {
-            FETKit.image_gallery.container = container;
+        setup: function(effect,container,interval) {
+            FETKit.imageGallery.container = container;
             var ul = container + ' ul';
             var lis = container + ' ul li';
             var images = container + ' ul li img';
@@ -83,44 +81,77 @@ var FETKit = {
                 layout();
                 
                 $(lis + ':eq(0)').addClass('current');
-                FETKit.image_gallery.currentIndex = 0;
+                FETKit.imageGallery.currentIndex = 0;
                 
-                if(FETKit.image_gallery.firstTime !== false) {
+                if(FETKit.imageGallery.firstTime !== false) {
                     
                     //GENERATE UNIQUE STRING
                     var text = "", possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
                     for( var i=0; i < 16; i++ ) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
-                    FETKit.image_gallery.customId = text;
+                    FETKit.imageGallery.customId = text;
                     
                     
                     //THROTTLE/ANONYMISER
                     setTimeout(function() {
                         $(container).animate({opacity:1});
-                        var currentVis = $(lis+':eq('+FETKit.image_gallery.currentIndex+')');
-                        FETKit.image_gallery.type.effect.load();
-                        FETKit.image_gallery.firstTime = false;
-                        FETKit.image_gallery.ready = true;
+                        var currentVis = $(lis+':eq('+FETKit.imageGallery.currentIndex+')');
+                        switch(effect) {
+                            case 'fade':
+                                $(lis).css({'float':'none'});
+                                $(lis).not(currentVis).css({'opacity':0,'position':'absolute','z-index':'0'});
+                                currentVis.css({'position':'absolute','z-index':'8'});
+                                FETKit.imageGallery.type.effect = 'fade';
+                            break;
+                           
+                            case 'slide':
+                                $(lis).css({'float':'left'});
+                                $(lis).parent().css('width',$(container).width()*$(lis).size());
+                                $(lis).not(currentVis).css({'opacity':1,'position':'relative','z-index':'1'});
+                                currentVis.css({'position':'relative','z-index':'8'});
+                                FETKit.imageGallery.type.effect = 'slide';
+                                
+                                //NEEDS TO BE FINISHED ( SEE BELOW )
+                                
+                            break;
+                             /*
+                            case 'mask':
+                            
+                                //NEEDS TO BE PORTED IN
+                                
+                            break;
+                            */
+                        }
+                        FETKit.imageGallery.firstTime = false;
+                        FETKit.imageGallery.ready = true;
+
+                        layout();
+
+                        if(interval) {
+                            FETKit.imageGallery.run(interval);
+                        }
                     });
                 }
             });
         },
-        run: function(callback) {
-            this.interval = setInterval(function() {
-                if(FETKit.image_gallery.ready == true)
-                    FETKit.image_gallery.goTo();
-            },4000);
-            
-            // Actually comes out to 4500 because of the buffer ( not sure how to work around this )
+        run: function(interval, callback) {
+            if(interval) {
+                var int;
+                var spin = function() {
+                    int = setInterval(function() {
+                        FETKit.imageGallery.goTo();
+                    },interval);
+                }
+                spin();
+            }
         },
-        on: function(event,callback) {
-            console.log(callback);
+        on: function(event, callback) {
             if(event == 'change') {
                 var sniffer,run,callback = callback;
                 run = function() {
-                    callback(FETKit.image_gallery.currentIndex);
-                    var current = FETKit.image_gallery.currentIndex;
+                    callback(FETKit.imageGallery.currentIndex);
+                    var current = FETKit.imageGallery.currentIndex;
                     sniffer = setInterval(function() {
-                        if(FETKit.image_gallery.currentIndex !== current) {
+                        if(FETKit.imageGallery.currentIndex !== current) {
                             clearInterval(sniffer);
                             run();
                         }
@@ -129,25 +160,25 @@ var FETKit = {
                 run();
             }
         },
-        goTo: function(index,callback) {
-            if(index !== FETKit.image_gallery.currentIndex) {
+        goTo: function(index, callback) {
+            if(index !== FETKit.imageGallery.currentIndex) {
                 
-                var container = FETKit.image_gallery.container;
-                var lis = FETKit.image_gallery.container + ' ul li';
-                var images = FETKit.image_gallery.container + ' ul li img';
+                var container = FETKit.imageGallery.container;
+                var lis = FETKit.imageGallery.container + ' ul li';
+                var images = FETKit.imageGallery.container + ' ul li img';
                 
                 //index management
-                var currentIndex = FETKit.image_gallery.currentIndex;
+                var currentIndex = FETKit.imageGallery.currentIndex;
                 var nextIndex;
     
                 
                 if(typeof index == 'undefined') { nextIndex = currentIndex+1; } 
-                else { nextIndex = index; clearInterval(FETKit.image_gallery.run.interval);  }
+                else { nextIndex = index; clearInterval(FETKit.imageGallery.run.interval);  }
                 
                 if(nextIndex > ($(lis).size()-1)) { nextIndex = 0; }
                 
                 //FX
-                switch(FETKit.image_gallery.type.effect) {
+                switch(FETKit.imageGallery.type.effect) {
                     case 'fade':
                         var currentVis = $(lis+':eq('+currentIndex+')');
                         currentVis.animate({'opacity':0});
@@ -163,7 +194,7 @@ var FETKit = {
                     break;
                     */
                 }
-                FETKit.image_gallery.currentIndex = nextIndex;
+                FETKit.imageGallery.currentIndex = nextIndex;
             }
         }
     },
