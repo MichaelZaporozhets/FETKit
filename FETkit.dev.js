@@ -51,9 +51,9 @@ var FETKit = {
             var styleElement = document.createElement("style");
             styleElement.type = "text/css";
             if (styleElement.styleSheet) {
-            styleElement.styleSheet.cssText = cssCode;
+                styleElement.styleSheet.cssText = cssCode;
             } else {
-            styleElement.appendChild(document.createTextNode(cssCode));
+                styleElement.appendChild(document.createTextNode(cssCode));
             }
             document.getElementsByTagName("head")[0].appendChild(styleElement);
             $(document).ready(function() {
@@ -189,7 +189,7 @@ var FETKit = {
                 else { nextIndex = index; clearInterval(FETKit.imageGallery.run.interval);  }
 
                 if(nextIndex > ($(lis).size()-1)) { nextIndex = 0; }
-                
+
                 //FX
                 switch(FETKit.imageGallery.type.effect) {
                     case 'fade':
