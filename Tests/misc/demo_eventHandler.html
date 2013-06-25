@@ -4,7 +4,11 @@
 		<script src="./dependencies/jquery-1.7.1.min.js"></script>
 		<script src="../../FETKit.dev.js"></script>
 		<script>
-		    FETKit.imageGallery.setup('slide','.img_slider',{ 'width': '100%', 'height': '100%' }, 3000);
+		    FETKit.imageGallery.setup('slide','.img_slider',{ 'width': '100%', 'height': '100%' }, 6000);
+		    
+		    FETKit.imageGallery.on('change',function(newIndex) { 
+		    	console.log(newIndex); 
+		    });
 		</script>
 	</head>
 	<body>

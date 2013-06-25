@@ -1,3 +1,4 @@
+//begin 
 var FETKit = {
     imageGallery: {
         ready: false,
@@ -28,11 +29,11 @@ var FETKit = {
                         currentVis.css({'position':'relative','z-index':'8'});
                         FETKit.imageGallery.type.effect = 'slide';
                     }
-                    
+
                     //NEEDS TO BE FINISHED ( SEE BELOW )
                     
                 break;
-                 /*
+                /*
                 case 'mask':
                 
                     //NEEDS TO BE PORTED IN
@@ -42,95 +43,108 @@ var FETKit = {
             };
             return returnFunc;
         },
-        setup: function(effect,container,interval) {
-            FETKit.imageGallery.container = container;
-            var ul = container + ' ul';
-            var lis = container + ' ul li';
-            var images = container + ' ul li img';
-            
-            //css reset
-            $(container+','+ul+','+lis+','+images).css({'padding':0,'border':0,'font-size':'100%','font':'inherit','vertical-align':'baseline','overflow':'hidden','list-style':'none'});
-            $(ul).css('margin-top',0);
-            $(lis).css({'list-style':'none','display':'block'});
-            $(lis).css('top','0px');
-            
-            $('body').prepend('<style>ul,ol,li,img { margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; }</style>');
-            
-            var layout = function() {
-                switch(effect) {
-                    case 'slide':
-                        $(lis).parent().css('width',$(container).width()*$(lis).size());
-                    break;
-                }
+        setup: function(effect,container,style,interval) {
+            if(style.width && style.height) {
+                var style = 'width: '+style.width+'; height: '+ style.height + ';';
+            }
+            var cssCode = "html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after{content:'';content:none}q:before,q:after{content:'';content:none}table{border-collapse:collapse;border-spacing:0}.clear{clear:both}.img_slider{"+style+"opacity:0; overflow: hidden; position: absolute;}";
+            var styleElement = document.createElement("style");
+            styleElement.type = "text/css";
+            if (styleElement.styleSheet) {
+            styleElement.styleSheet.cssText = cssCode;
+            } else {
+            styleElement.appendChild(document.createTextNode(cssCode));
+            }
+            document.getElementsByTagName("head")[0].appendChild(styleElement);
+            $(document).ready(function() {
+                FETKit.imageGallery.container = container;
+                var ul = container + ' ul';
+                var lis = container + ' ul li';
+                var images = container + ' ul li img';
                 
-                if($(container).height() > $(images+':eq(0)').height()) {
-                    $(images).height($(container).height());    
-                    $(images).width('');
-                } else {
-                    $(images).width($(container).width());   
-                    $(images).height('');
-                }
-                $(images).css({'margin-top':-(($(images).height()-$(container).height())/2)});
-                $(images).css({'margin-left':-(($(images).width()-$(container).width())/2)});
+                //css reset
+                $(container+','+ul+','+lis+','+images).css({'padding':0,'border':0,'font-size':'100%','font':'inherit','vertical-align':'baseline','overflow':'hidden','list-style':'none'});
+                $(ul).css('margin-top',0);
+                $(lis).css({'list-style':'none','display':'block'});
+                $(lis).css('top','0px');
                 
-            };
-            $(window).resize(function() {
-                layout();
-            });
-            $(window).load(function() {
-                layout();
+                $('body').prepend('<style>ul,ol,li,img { margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; }</style>');
                 
-                $(lis + ':eq(0)').addClass('current');
-                FETKit.imageGallery.currentIndex = 0;
-                
-                if(FETKit.imageGallery.firstTime !== false) {
+                var layout = function() {
+                    switch(effect) {
+                        case 'slide':
+                            $(lis).parent().css('width',$(container).width()*$(lis).size());
+                        break;
+                    }
+                    if($(container).height() > $(images+':eq(0)').height()) {
+                        $(images).height($(container).height());    
+                        $(images).width('');
+                    } else {
+                        $(images).width($(container).width());   
+                        $(images).height('');
+                    }
+                    $(images).css({'margin-top':-(($(images).height()-$(container).height())/2)});
+                    $(images).css({'margin-left':-(($(images).width()-$(container).width())/2)});
                     
-                    //GENERATE UNIQUE STRING
-                    var text = "", possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                    for( var i=0; i < 16; i++ ) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
-                    FETKit.imageGallery.customId = text;
+                };
+                $(window).resize(function() {
+                    layout();
+                });
+                $(window).load(function() {
+                    layout();
                     
+                    $(lis + ':eq(0)').addClass('current');
+                    FETKit.imageGallery.currentIndex = 0;
                     
-                    //THROTTLE/ANONYMISER
-                    setTimeout(function() {
-                        $(container).animate({opacity:1});
-                        var currentVis = $(lis+':eq('+FETKit.imageGallery.currentIndex+')');
-                        switch(effect) {
-                            case 'fade':
-                                $(lis).css({'float':'none'});
-                                $(lis).not(currentVis).css({'opacity':0,'position':'absolute','z-index':'0'});
-                                currentVis.css({'position':'absolute','z-index':'8'});
-                                FETKit.imageGallery.type.effect = 'fade';
-                            break;
-                           
-                            case 'slide':
-                                $(lis).css({'float':'left'});
-                                $(lis).parent().css('width',$(container).width()*$(lis).size());
-                                $(lis).not(currentVis).css({'opacity':1,'position':'relative','z-index':'1'});
-                                currentVis.css({'position':'relative','z-index':'8'});
-                                FETKit.imageGallery.type.effect = 'slide';
+                    if(FETKit.imageGallery.firstTime !== false) {
+                        
+                        //GENERATE UNIQUE STRING
+                        var text = "", possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                        for( var i=0; i < 16; i++ ) { text += possible.charAt(Math.floor(Math.random() * possible.length)); }
+                        FETKit.imageGallery.customId = text;
+                        
+                        
+                        //THROTTLE/ANONYMISER
+                        setTimeout(function() {
+                            $(container).animate({opacity:1});
+                            var currentVis = $(lis+':eq('+FETKit.imageGallery.currentIndex+')');
+                            switch(effect) {
+                                case 'fade':
+                                    $(lis).css({'float':'none'});
+                                    $(lis).not(currentVis).css({'opacity':0,'position':'absolute','z-index':'0'});
+                                    currentVis.css({'position':'absolute','z-index':'8'});
+                                    FETKit.imageGallery.type.effect = 'fade';
+                                break;
+                               
+                                case 'slide':
+                                    $(lis).css({'float':'left'});
+                                    $(lis).parent().css('width',$(container).width()*$(lis).size());
+                                    $(lis).not(currentVis).css({'opacity':1,'position':'relative','z-index':'1'});
+                                    currentVis.css({'position':'relative','z-index':'8'});
+                                    FETKit.imageGallery.type.effect = 'slide';
+                                    
+                                    //NEEDS TO BE FINISHED ( SEE BELOW )
+                                    
+                                break;
+                                 /*
+                                case 'mask':
                                 
-                                //NEEDS TO BE FINISHED ( SEE BELOW )
-                                
-                            break;
-                             /*
-                            case 'mask':
-                            
-                                //NEEDS TO BE PORTED IN
-                                
-                            break;
-                            */
-                        }
-                        FETKit.imageGallery.firstTime = false;
-                        FETKit.imageGallery.ready = true;
+                                    //NEEDS TO BE PORTED IN
+                                    
+                                break;
+                                */
+                            }
+                            FETKit.imageGallery.firstTime = false;
+                            FETKit.imageGallery.ready = true;
 
-                        layout();
+                            layout();
 
-                        if(interval) {
-                            FETKit.imageGallery.run(interval);
-                        }
-                    });
-                }
+                            if(interval) {
+                                FETKit.imageGallery.run(interval);
+                            }
+                        });
+                    }
+                });
             });
         },
         run: function(interval, callback) {
@@ -170,11 +184,10 @@ var FETKit = {
                 //index management
                 var currentIndex = FETKit.imageGallery.currentIndex;
                 var nextIndex;
-    
-                
+
                 if(typeof index == 'undefined') { nextIndex = currentIndex+1; } 
                 else { nextIndex = index; clearInterval(FETKit.imageGallery.run.interval);  }
-                
+
                 if(nextIndex > ($(lis).size()-1)) { nextIndex = 0; }
                 
                 //FX
